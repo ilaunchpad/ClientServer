@@ -18,7 +18,8 @@ public class Client
 	static BigInteger P;
 	static int        L;
 	static byte []    serverEncKey ;
-	 static byte [] clientEncPk;
+	
+	 //static byte [] clientEncPk;
     public static void main(String[] args) throws IOException  
     { 
         try
@@ -40,23 +41,10 @@ public class Client
             output.writeObject("I received your message");
             System.out.println("First handshake done");
             
-            
-            	//TimeUnit.SECONDS.sleep(300);
-           
-      
-            // obtaining input and out streams 
-            //DataInputStream dis = new DataInputStream(s.getInputStream()); 
-            //DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
-      
-            // the following loop performs the exchange of 
-            // information between client and client handler 
-            
-            
-           // ObjectOutputStream output = new ObjectOutputStream(s.getOutputStream());
            
             while (true)  
             { 
-                
+                 	SecretKey bobDeskey = null;
             	     G  =(BigInteger) input.readObject();            
                  P = (BigInteger) input.readObject();
                  L = (int) input.readObject();  
@@ -68,24 +56,23 @@ public class Client
                 if (serverEncKey !=null) {
                 		ArrayList  ClientParamList =DHKey.BobGenerateParameters(P, G,L); 
                 		byte []clientEncPK = (byte[]) ClientParamList.get(0);
+                		System.out.println("ClientEncPK" + clientEncPK);
             		    KeyAgreement bobka = (KeyAgreement) ClientParamList.get(1);   
-            		    output.writeObject(clientEncPk);
+            		    output.writeObject(clientEncPK);
         				byte[] ClientSecretKey = DHKey.GenerateSecretKey(serverEncKey, bobka );
-        				SecretKey bobDeskey = DHKey.GenerateDesKey(ClientSecretKey) ;
-        				System.out.println("alice Des Key " + bobDeskey);
+        				 bobDeskey = DHKey.GenerateDesKey(ClientSecretKey) ;
+        				System.out.println("Client Des Key " + bobDeskey);
+        				System.out.println("The key exchange is done. And the communication is secured");
                 
                 }
-                  				
-                System.exit(0);
-                String tosend = scn.nextLine(); 
-                
-                //dos.writeUTF(tosend); 
                  
-                  
-                  
-                // If client sends exit,close this connection  
-                // and then break from the while loop 
-                if(G.equals("Exit")) 
+                byte[] ciphertext = (byte[]) input.readObject();
+                String message = DHKey.decryptcipher(bobDeskey, ciphertext);
+                System.out.println("This is received message");
+                System.out.println(message);
+                
+              
+                if(message.equals("Exit")) 
                 { 
                     System.out.println("Closing this connection : " + s); 
                     s.close(); 
@@ -93,9 +80,7 @@ public class Client
                     break; 
                 } 
                   
-                // printing date or time as requested by client 
-               // String received = dis.readUTF(); 
-                //System.out.println(received); 
+                
             } 
               
             // closing resources 

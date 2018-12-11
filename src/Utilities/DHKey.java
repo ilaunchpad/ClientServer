@@ -123,6 +123,43 @@ public class DHKey {
 		return key;
 	}
 	
+	 public static byte[] generateciphertext(SecretKey key, String message) {
+	    //	String message = "Exit";
+	    	byte[] ciphertext = null;
+	    	try {
+				Cipher c = Cipher.getInstance("DES/ECB/PKCS5Padding");
+				c.init(Cipher.ENCRYPT_MODE, key);
+				 ciphertext = c.doFinal(message.getBytes());
+			
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	return ciphertext;
+	    }
+	 
+	public static String decryptcipher(SecretKey key, byte[]ciphertext) {
+		
+		Cipher c;
+		String s = null;
+		try {
+			c = Cipher.getInstance("DES/ECB/PKCS5Padding");
+			c.init(Cipher.DECRYPT_MODE, key);
+			byte plaintext[] = c.doFinal(ciphertext);
+			 String m = new String(plaintext);
+			 if (m != null) {
+				 s = m;
+			 }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+		
+		
+		return s;
+	}
+	
 	public static void main(String[] args) {
 		
 		ArrayList<Object> aliceparams=AliceGenerateParameters();

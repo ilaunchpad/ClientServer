@@ -2,7 +2,7 @@ import java.io.*;
 import java.text.*; 
 import java.util.*;
 
-import Utilities.DHAgreement;
+
 
 import java.net.*; 
 import java.io.ObjectOutputStream;
@@ -32,26 +32,17 @@ public class Server
                 s = ss.accept(); 
                   
                 System.out.println("A new client is connected : " + s); 
-                
-           
-                  
-                // obtaining input and out streams 
-                //DataInputStream dis = new DataInputStream(s.getInputStream()); 
-                //DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+               
                 ObjectOutputStream output = new ObjectOutputStream(s.getOutputStream());
                 output.writeObject("Sending from server");
                 ObjectInputStream input = new ObjectInputStream(s.getInputStream());
                 System.out.println(input.readObject()); 
                 System.out.println("Assigning new thread for this client"); 
                  
-                
-                
-                //System.out.println(dis.readUTF());
   
                 // create a new thread object 
                 Thread t = new ClientHandler(s, input, output);
-                t.start(); 
-                //dos.writeUTF("Sending from server"); 
+                t.start();  
                 
                   
             } 

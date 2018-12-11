@@ -5,10 +5,13 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import Utilities.DHKey;
@@ -18,7 +21,8 @@ import java.text.SimpleDateFormat;
 
 class ClientHandler extends Thread  
 { 
-    DateFormat fordate = new SimpleDateFormat("yyyy/MM/dd"); 
+    private static Object ciphertext;
+	DateFormat fordate = new SimpleDateFormat("yyyy/MM/dd"); 
     DateFormat fortime = new SimpleDateFormat("hh:mm:ss"); 
     //final DataInputStream dis; 
     //final DataOutputStream dos; 
@@ -36,6 +40,21 @@ class ClientHandler extends Thread
         this.input = input; 
         this.output = output; 
     } 
+    
+    public static byte[] generateciphertext(SecretKey key) {
+    	String message = "Exit";
+    	byte[] ciphertext = null;
+    	try {
+			Cipher c = Cipher.getInstance("DES/ECB/PKCS5Padding");
+			c.init(Cipher.ENCRYPT_MODE, key);
+			 ciphertext = c.doFinal(message.getBytes());
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return ciphertext;
+    }
   
     @Override
     public void run()  
@@ -45,6 +64,7 @@ class ClientHandler extends Thread
         String toreturn; 
         byte[] ClientEncKey;
         byte[] ServerSecretKey;
+        SecretKey ServerDeskey = null;
         ArrayList  paramList = DHKey.AliceGenerateParameters();
         BigInteger G = (BigInteger) paramList.get(0);
    	    BigInteger P     = (BigInteger) paramList.get(1);
@@ -61,18 +81,21 @@ class ClientHandler extends Thread
                output.writeObject(ServerEncKey);
                
                ClientEncKey = (byte[]) input.readObject();
+               System.out.println("This is clientenckey" + ClientEncKey);
                if (ClientEncKey !=null) {
            		 
    			    ServerSecretKey = DHKey.GenerateSecretKey(ClientEncKey, ka );
-   				SecretKey ServerDeskey = DHKey.GenerateDesKey(ServerSecretKey) ;
-   				System.out.println("alice Des Key " + ServerDeskey);
-           
-           }
-             
-            
-            	 
-            	 break;
+   				 ServerDeskey = DHKey.GenerateDesKey(ServerSecretKey) ;
+   				System.out.println("Server Des Key " + ServerDeskey);
+   				
+   		    }
                
+             byte[] tosend =  DHKey.generateciphertext(ServerDeskey, "Exit") ;  
+             output.writeObject(tosend);
+             System.out.print("Message sent");
+             
+             break;
+            	        
             
             } catch (Exception e) { 
                 e.printStackTrace(); 
@@ -81,9 +104,7 @@ class ClientHandler extends Thread
           
          try
          { 
-            // closing resources 
-            //this.dis.close(); 
-            //this.dos.close(); 
+           
         	 this.output.close();
         	 this.input.close();
               
