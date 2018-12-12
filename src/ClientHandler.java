@@ -23,9 +23,7 @@ class ClientHandler extends Thread
 { 
     private static Object ciphertext;
 	DateFormat fordate = new SimpleDateFormat("yyyy/MM/dd"); 
-    DateFormat fortime = new SimpleDateFormat("hh:mm:ss"); 
-    //final DataInputStream dis; 
-    //final DataOutputStream dos; 
+    DateFormat fortime = new SimpleDateFormat("hh:mm:ss");  
     final ObjectInputStream input;
     final ObjectOutputStream output;
     final Socket s; 
