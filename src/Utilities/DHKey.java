@@ -16,9 +16,6 @@ public class DHKey {
 	//static byte bob[];
 	//static byte alice[];
 	byte[] ciphertext;
-	//static BigInteger aliceP;
-	//static BigInteger aliceG;
-	//tatic int aliceL;
 	
 	
 	public  static final ArrayList<Object> AliceGenerateParameters()  {
